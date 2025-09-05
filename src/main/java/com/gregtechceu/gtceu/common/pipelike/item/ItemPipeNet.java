@@ -51,14 +51,4 @@ public class ItemPipeNet extends PipeNet<ItemPipeProperties> {
         ((ItemPipeNet) parentNet).NET_DATA.clear();
     }
 
-    @Override
-    protected void writeNodeData(ItemPipeProperties nodeData, CompoundTag tagCompound) {
-        tagCompound.putInt("Resistance", nodeData.getPriority());
-        tagCompound.putFloat("Rate", nodeData.getTransferRate());
-    }
-
-    @Override
-    protected ItemPipeProperties readNodeData(CompoundTag tagCompound) {
-        return new ItemPipeProperties(tagCompound.getInt("Resistance"), tagCompound.getFloat("Rate"));
-    }
 }

@@ -2,33 +2,23 @@ package com.gregtechceu.gtceu.api.pipenet;
 
 import com.gregtechceu.gtceu.utils.GTUtil;
 
-import com.lowdragmc.lowdraglib.syncdata.ITagSerializable;
-
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 import java.util.*;
-import java.util.Map.Entry;
 
-public abstract class PipeNet<NodeDataType> implements ITagSerializable<CompoundTag> {
+public abstract class PipeNet<NodeDataType> {
 
     protected final LevelPipeNet<NodeDataType, PipeNet<NodeDataType>> worldData;
     private final Map<BlockPos, Node<NodeDataType>> nodeByBlockPos = new HashMap<>();
     private final Map<BlockPos, Node<NodeDataType>> unmodifiableNodeByBlockPos = Collections
             .unmodifiableMap(nodeByBlockPos);
     private final Object2IntOpenHashMap<ChunkPos> ownedChunks = new Object2IntOpenHashMap<>();
-    private long lastUpdate;
     @Getter
     boolean isValid = false;
 
@@ -43,13 +33,6 @@ public abstract class PipeNet<NodeDataType> implements ITagSerializable<Compound
 
     public ServerLevel getLevel() {
         return worldData.getWorld();
-    }
-
-    /**
-     * Is only called when connections changed of nodes. Nodes can ONLY connect to other nodes.
-     */
-    protected void onNodeConnectionsUpdate() {
-        this.lastUpdate = System.currentTimeMillis();
     }
 
     /**
@@ -71,21 +54,14 @@ public abstract class PipeNet<NodeDataType> implements ITagSerializable<Compound
         return nodeByBlockPos.containsKey(blockPos);
     }
 
-    protected void addNodeSilently(BlockPos nodePos, Node<NodeDataType> node) {
+    protected void addNode(BlockPos nodePos, Node<NodeDataType> node) {
         this.nodeByBlockPos.put(nodePos, node);
         checkAddedInChunk(nodePos);
-    }
-
-    protected void addNode(BlockPos nodePos, Node<NodeDataType> node) {
-        addNodeSilently(nodePos, node);
-        onNodeConnectionsUpdate();
-        worldData.setDirty();
     }
 
     protected Node<NodeDataType> removeNodeWithoutRebuilding(BlockPos nodePos) {
         Node<NodeDataType> removedNode = this.nodeByBlockPos.remove(nodePos);
         ensureRemovedFromChunk(nodePos);
-        worldData.setDirty();
         return removedNode;
     }
 
@@ -166,8 +142,6 @@ public abstract class PipeNet<NodeDataType> implements ITagSerializable<Compound
                 uniteNetworks(pipeNetAtOffset);
             }
         }
-        onNodeConnectionsUpdate();
-        worldData.setDirty();
     }
 
     private void setBlocked(Node<NodeDataType> selfNode, Direction facing, boolean isBlocked) {
@@ -181,8 +155,6 @@ public abstract class PipeNet<NodeDataType> implements ITagSerializable<Compound
     public boolean markNodeAsActive(BlockPos nodePos, boolean isActive) {
         if (containsNode(nodePos) && getNodeAt(nodePos).isActive != isActive) {
             getNodeAt(nodePos).isActive = isActive;
-            worldData.setDirty();
-            onNodeConnectionsUpdate();
             return true;
         }
         return false;
@@ -273,8 +245,6 @@ public abstract class PipeNet<NodeDataType> implements ITagSerializable<Compound
             // if this energy net is empty now, remove it
             worldData.removePipeNet(this);
         }
-        onNodeConnectionsUpdate();
-        worldData.setDirty();
     }
 
     /**
@@ -286,103 +256,7 @@ public abstract class PipeNet<NodeDataType> implements ITagSerializable<Compound
      */
     protected void transferNodeData(Map<BlockPos, Node<NodeDataType>> transferredNodes,
                                     PipeNet<NodeDataType> parentNet) {
-        transferredNodes.forEach(this::addNodeSilently);
-        onNodeConnectionsUpdate();
-        worldData.setDirty();
+        transferredNodes.forEach(this::addNode);
     }
 
-    /**
-     * Serializes node data into specified tag compound
-     * Used for writing persistent node data
-     */
-    protected abstract void writeNodeData(NodeDataType nodeData, CompoundTag tagCompound);
-
-    /**
-     * Deserializes node data from specified tag compound
-     * Used for reading persistent node data
-     */
-    protected abstract NodeDataType readNodeData(CompoundTag tagCompound);
-
-    @Override
-    public CompoundTag serializeNBT() {
-        CompoundTag compound = new CompoundTag();
-        compound.put("Nodes", serializeAllNodeList(nodeByBlockPos));
-        return compound;
-    }
-
-    @Override
-    public void deserializeNBT(CompoundTag nbt) {
-        this.nodeByBlockPos.clear();
-        this.ownedChunks.clear();
-        deserializeAllNodeList(nbt.getCompound("Nodes"));
-    }
-
-    protected void deserializeAllNodeList(CompoundTag compound) {
-        ListTag allNodesList = compound.getList("NodeIndexes", Tag.TAG_COMPOUND);
-        ListTag wirePropertiesList = compound.getList("WireProperties", Tag.TAG_COMPOUND);
-        Int2ObjectMap<NodeDataType> readProperties = new Int2ObjectOpenHashMap<>();
-
-        for (int i = 0; i < wirePropertiesList.size(); i++) {
-            CompoundTag propertiesTag = wirePropertiesList.getCompound(i);
-            int wirePropertiesIndex = propertiesTag.getInt("index");
-            NodeDataType nodeData = readNodeData(propertiesTag);
-            readProperties.put(wirePropertiesIndex, nodeData);
-        }
-
-        for (int i = 0; i < allNodesList.size(); i++) {
-            CompoundTag nodeTag = allNodesList.getCompound(i);
-            int x = nodeTag.getInt("x");
-            int y = nodeTag.getInt("y");
-            int z = nodeTag.getInt("z");
-            int wirePropertiesIndex = nodeTag.getInt("index");
-            BlockPos blockPos = new BlockPos(x, y, z);
-            NodeDataType nodeData = readProperties.get(wirePropertiesIndex);
-            int openConnections = nodeTag.getInt("open");
-            boolean isNodeActive = nodeTag.getBoolean("active");
-            addNodeSilently(blockPos, new Node<>(nodeData, openConnections, isNodeActive));
-        }
-    }
-
-    protected CompoundTag serializeAllNodeList(Map<BlockPos, Node<NodeDataType>> allNodes) {
-        CompoundTag compound = new CompoundTag();
-        ListTag allNodesList = new ListTag();
-        ListTag wirePropertiesList = new ListTag();
-        Object2IntMap<NodeDataType> alreadyWritten = new Object2IntOpenHashMap<>();
-        int currentIndex = 0;
-
-        for (Entry<BlockPos, Node<NodeDataType>> entry : allNodes.entrySet()) {
-            BlockPos nodePos = entry.getKey();
-            Node<NodeDataType> node = entry.getValue();
-            CompoundTag nodeTag = new CompoundTag();
-            nodeTag.putInt("x", nodePos.getX());
-            nodeTag.putInt("y", nodePos.getY());
-            nodeTag.putInt("z", nodePos.getZ());
-            int wirePropertiesIndex = alreadyWritten.getOrDefault(node.data, -1);
-            if (wirePropertiesIndex == -1) {
-                wirePropertiesIndex = currentIndex;
-                alreadyWritten.put(node.data, wirePropertiesIndex);
-                currentIndex++;
-            }
-            nodeTag.putInt("index", wirePropertiesIndex);
-            if (node.openConnections > 0) {
-                nodeTag.putInt("open", node.openConnections);
-            }
-            if (node.isActive) {
-                nodeTag.putBoolean("active", true);
-            }
-            allNodesList.add(nodeTag);
-        }
-
-        for (NodeDataType nodeData : alreadyWritten.keySet()) {
-            int wirePropertiesIndex = alreadyWritten.getInt(nodeData);
-            CompoundTag propertiesTag = new CompoundTag();
-            propertiesTag.putInt("index", wirePropertiesIndex);
-            writeNodeData(nodeData, propertiesTag);
-            wirePropertiesList.add(propertiesTag);
-        }
-
-        compound.put("NodeIndexes", allNodesList);
-        compound.put("WireProperties", wirePropertiesList);
-        return compound;
-    }
 }
