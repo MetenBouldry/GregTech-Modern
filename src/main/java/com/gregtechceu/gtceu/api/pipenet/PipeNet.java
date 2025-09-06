@@ -2,13 +2,13 @@ package com.gregtechceu.gtceu.api.pipenet;
 
 import com.gregtechceu.gtceu.utils.GTUtil;
 
-import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import lombok.Getter;
 
 import java.util.*;
 
@@ -258,5 +258,4 @@ public abstract class PipeNet<NodeDataType> {
                                     PipeNet<NodeDataType> parentNet) {
         transferredNodes.forEach(this::addNode);
     }
-
 }

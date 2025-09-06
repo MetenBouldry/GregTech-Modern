@@ -27,7 +27,7 @@ import java.util.*;
  * <b>Do not walk a walker more than once</b>
  */
 @SuppressWarnings("unused")
-public abstract class PipeNetWalker<T extends IPipeNode<?, ?>, NodeDataType, Net extends PipeNet<NodeDataType>> {
+public abstract class PipeNetWalker<T extends PipeBlockEntity<?, ?>, NodeDataType, Net extends PipeNet<NodeDataType>> {
 
     protected PipeNetWalker<T, NodeDataType, Net> root;
     protected final Net pipeNet;
@@ -151,7 +151,7 @@ public abstract class PipeNetWalker<T extends IPipeNode<?, ?>, NodeDataType, Net
             if (nextPipeFacings.isEmpty())
                 return true;
             if (nextPipeFacings.size() == 1) {
-                currentPos.set(nextPipes.get(0).getPipePos());
+                currentPos.set(nextPipes.get(0).getBlockPos());
                 currentPipe = nextPipes.get(0);
                 from = nextPipeFacings.get(0).getOpposite();
                 walkedBlocks++;
@@ -187,7 +187,7 @@ public abstract class PipeNetWalker<T extends IPipeNode<?, ?>, NodeDataType, Net
         nextPipes.clear();
         if (currentPipe == null) {
             BlockEntity thisPipe = getLevel().getBlockEntity(currentPos);
-            if (!(thisPipe instanceof IPipeNode<?, ?>)) {
+            if (!(thisPipe instanceof PipeBlockEntity<?, ?>)) {
                 GTCEu.LOGGER.error("PipeWalker expected a pipe, but found {} at {}", thisPipe, currentPos);
                 return false;
             }

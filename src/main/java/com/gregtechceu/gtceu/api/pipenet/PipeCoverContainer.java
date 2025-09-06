@@ -36,7 +36,7 @@ public class PipeCoverContainer implements ICoverable, IEnhancedManaged {
     public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(PipeCoverContainer.class);
     @Getter
     private final FieldManagedStorage syncStorage = new FieldManagedStorage(this);
-    private final IPipeNode<?, ?> pipeTile;
+    private final PipeBlockEntity<?, ?> pipeTile;
 
     @DescSynced
     @Persisted
@@ -46,7 +46,7 @@ public class PipeCoverContainer implements ICoverable, IEnhancedManaged {
                      deserializeMethod = "deserializeCoverUid")
     private CoverBehavior up, down, north, south, west, east;
 
-    public PipeCoverContainer(IPipeNode<?, ?> pipeTile) {
+    public PipeCoverContainer(PipeBlockEntity<?, ?> pipeTile) {
         this.pipeTile = pipeTile;
     }
 
@@ -72,12 +72,12 @@ public class PipeCoverContainer implements ICoverable, IEnhancedManaged {
 
     @Override
     public Level getLevel() {
-        return pipeTile.getPipeLevel();
+        return pipeTile.getLevel();
     }
 
     @Override
     public BlockPos getPos() {
-        return pipeTile.getPipePos();
+        return pipeTile.getBlockPos();
     }
 
     @Override
@@ -87,7 +87,7 @@ public class PipeCoverContainer implements ICoverable, IEnhancedManaged {
 
     @Override
     public void markDirty() {
-        pipeTile.markAsDirty();
+        pipeTile.setChanged();
     }
 
     @Override
@@ -107,7 +107,7 @@ public class PipeCoverContainer implements ICoverable, IEnhancedManaged {
 
     @Override
     public boolean isInValid() {
-        return pipeTile.isInValid();
+        return pipeTile.isRemoved();
     }
 
     @Override

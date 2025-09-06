@@ -74,7 +74,8 @@ public class EnergyNetWalker extends PipeNetWalker<CableBlockEntity, WirePropert
                     .getCapability(GTCapability.CAPABILITY_ENERGY_CONTAINER, faceToNeighbour.getOpposite()).resolve()
                     .orElse(null);
             if (container != null) {
-                routes.add(new EnergyRoutePath(pipePos.immutable(), faceToNeighbour, pipes, getWalkedBlocks(), loss, maxVoltage));
+                routes.add(new EnergyRoutePath(pipePos.immutable(), faceToNeighbour, pipes, getWalkedBlocks(), loss,
+                        maxVoltage));
             }
         }
     }

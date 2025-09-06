@@ -5,12 +5,9 @@ import com.gregtechceu.gtceu.api.capability.IEnergyContainer;
 import com.gregtechceu.gtceu.common.blockentity.CableBlockEntity;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
-import lombok.Getter;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.Blocks;
+
+import lombok.Getter;
 
 import java.util.Objects;
 
@@ -46,12 +43,12 @@ public class EnergyNetHandler implements IEnergyContainer {
         }
 
         long amperesUsed = 0L;
-        for (EnergyRoutePath path : net.getNetData(cable.getPipePos())) {
+        for (EnergyRoutePath path : net.getNetData(cable.getBlockPos())) {
             // Will lose all the energy with this path, so don't use it
             if (path.getMaxLoss() >= voltage) continue;
 
             // Do not insert into source handler
-            if (cable.getPipePos().equals(path.getTargetPipePos()) && side == path.getTargetFacing()) continue;
+            if (cable.getBlockPos().equals(path.getTargetPipePos()) && side == path.getTargetFacing()) continue;
 
             IEnergyContainer dest = path.getHandler(getNet().getLevel());
             if (dest == null) continue;
@@ -69,7 +66,7 @@ public class EnergyNetHandler implements IEnergyContainer {
                                 45 + 36.5);
                         cable.applyHeat(heat);
 
-                        cableBroken = cable.isInValid();
+                        cableBroken = cable.isRemoved();
                         if (cableBroken) break;
 
                         // limit transfer to cables max and void rest
@@ -90,7 +87,7 @@ public class EnergyNetHandler implements IEnergyContainer {
                 voltageTraveled -= cable.getNodeData().getLossPerBlock();
                 if (voltageTraveled <= 0) break;
 
-                if (!cable.isInValid()) {
+                if (!cable.isRemoved()) {
                     cable.incrementAmperage(amps, voltageTraveled);
                 }
             }

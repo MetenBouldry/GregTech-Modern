@@ -7,7 +7,6 @@ import com.gregtechceu.gtceu.api.pipenet.PipeNet;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 
 import java.util.*;
 
@@ -50,5 +49,4 @@ public class ItemPipeNet extends PipeNet<ItemPipeProperties> {
         NET_DATA.clear();
         ((ItemPipeNet) parentNet).NET_DATA.clear();
     }
-
 }

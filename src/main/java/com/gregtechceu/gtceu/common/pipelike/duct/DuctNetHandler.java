@@ -40,11 +40,11 @@ public class DuctNetHandler implements IHazardParticleContainer {
 
     @Nullable
     private IHazardParticleContainer getInnerContainer() {
-        if (net == null || pipe.isInValid() || facing == null || pipe.isBlocked(facing)) {
+        if (net == null || pipe.isRemoved() || facing == null || pipe.isBlocked(facing)) {
             return null;
         }
 
-        final List<DuctRoutePath> data = net.getNetData(pipe.getPipePos(), facing);
+        final List<DuctRoutePath> data = net.getNetData(pipe.getBlockPos(), facing);
         if (data == null) {
             return null;
         }

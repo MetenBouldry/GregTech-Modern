@@ -55,7 +55,7 @@ public class ItemNetHandler implements IItemHandlerModifiable {
     public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
         if (stack.isEmpty()) return stack;
 
-        if (network == null || pipe == null || pipe.isInValid() || pipe.isBlocked(facing)) {
+        if (network == null || pipe == null || pipe.isRemoved() || pipe.isBlocked(facing)) {
             return stack;
         }
 
@@ -64,7 +64,7 @@ public class ItemNetHandler implements IItemHandlerModifiable {
         simulatedTransfersGlobalRoundRobin.putAll(pipe.getTransferred());
 
         CoverBehavior pipeCover = pipe.getCoverContainer().getCoverAtSide(facing);
-        CoverBehavior tileCover = getCoverOnNeighbour(pipe.getPipePos(), facing);
+        CoverBehavior tileCover = getCoverOnNeighbour(pipe.getBlockPos(), facing);
         ConveyorCover conveyor = null;
 
         // abort if there are two conveyors
@@ -75,7 +75,7 @@ public class ItemNetHandler implements IItemHandlerModifiable {
         if (pipeCover instanceof ConveyorCover pipeConveyor) conveyor = pipeConveyor;
         if (tileCover instanceof ConveyorCover tileConveyor) conveyor = tileConveyor;
 
-        List<ItemRoutePath> routePaths = network.getNetData(pipe.getPipePos(), facing);
+        List<ItemRoutePath> routePaths = network.getNetData(pipe.getBlockPos(), facing);
         if (routePaths.isEmpty()) return stack;
         List<ItemRoutePath> routePathsCopy = new ArrayList<>(routePaths);
 
@@ -283,7 +283,7 @@ public class ItemNetHandler implements IItemHandlerModifiable {
         }
         CoverBehavior pipeCover = routePath.getTargetPipe().getCoverContainer()
                 .getCoverAtSide(routePath.getTargetFacing());
-        CoverBehavior tileCover = getCoverOnNeighbour(routePath.getTargetPipe().getPipePos(),
+        CoverBehavior tileCover = getCoverOnNeighbour(routePath.getTargetPipe().getBlockPos(),
                 routePath.getTargetFacing());
 
         if (pipeCover != null) {
