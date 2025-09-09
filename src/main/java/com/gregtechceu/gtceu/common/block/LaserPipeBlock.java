@@ -4,10 +4,12 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.block.PipeBlock;
 import com.gregtechceu.gtceu.api.capability.forge.GTCapability;
 import com.gregtechceu.gtceu.api.pipenet.PipeBlockEntity;
+import com.gregtechceu.gtceu.api.pipenet.PipeNetworkType;
 import com.gregtechceu.gtceu.client.model.PipeModel;
 import com.gregtechceu.gtceu.client.renderer.block.PipeBlockRenderer;
 import com.gregtechceu.gtceu.common.blockentity.LaserPipeBlockEntity;
 import com.gregtechceu.gtceu.common.data.GTBlockEntities;
+import com.gregtechceu.gtceu.common.pipelike.GTPipeNetworks;
 import com.gregtechceu.gtceu.common.pipelike.laser.LaserPipeProperties;
 import com.gregtechceu.gtceu.common.pipelike.laser.LaserPipeType;
 import com.gregtechceu.gtceu.common.pipelike.laser.LevelLaserPipeNet;
@@ -64,6 +66,11 @@ public class LaserPipeBlock extends PipeBlock<LaserPipeType, LaserPipeProperties
     }
 
     @Override
+    public PipeNetworkType getPipeType() {
+        return GTPipeNetworks.LASER;
+    }
+
+    @Override
     public LevelLaserPipeNet getWorldPipeNet(ServerLevel world) {
         return LevelLaserPipeNet.getOrCreate(world);
     }
@@ -98,12 +105,6 @@ public class LaserPipeBlock extends PipeBlock<LaserPipeType, LaserPipeProperties
     @Override
     protected PipeModel getPipeModel() {
         return model;
-    }
-
-    @Override
-    public boolean canPipesConnect(PipeBlockEntity<LaserPipeType, LaserPipeProperties> selfTile, Direction side,
-                                   PipeBlockEntity<LaserPipeType, LaserPipeProperties> sideTile) {
-        return selfTile instanceof LaserPipeBlockEntity && sideTile instanceof LaserPipeBlockEntity;
     }
 
     @Override

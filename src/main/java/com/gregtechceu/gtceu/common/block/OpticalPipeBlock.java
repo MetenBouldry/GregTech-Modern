@@ -4,10 +4,12 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.block.PipeBlock;
 import com.gregtechceu.gtceu.api.capability.forge.GTCapability;
 import com.gregtechceu.gtceu.api.pipenet.PipeBlockEntity;
+import com.gregtechceu.gtceu.api.pipenet.PipeNetworkType;
 import com.gregtechceu.gtceu.client.model.PipeModel;
 import com.gregtechceu.gtceu.client.renderer.block.PipeBlockRenderer;
 import com.gregtechceu.gtceu.common.blockentity.OpticalPipeBlockEntity;
 import com.gregtechceu.gtceu.common.data.GTBlockEntities;
+import com.gregtechceu.gtceu.common.pipelike.GTPipeNetworks;
 import com.gregtechceu.gtceu.common.pipelike.optical.LevelOpticalPipeNet;
 import com.gregtechceu.gtceu.common.pipelike.optical.OpticalPipeProperties;
 import com.gregtechceu.gtceu.common.pipelike.optical.OpticalPipeType;
@@ -49,6 +51,12 @@ public class OpticalPipeBlock extends PipeBlock<OpticalPipeType, OpticalPipeProp
                 () -> GTCEu.id("block/pipe/pipe_optical_in"), null, null);
         this.renderer = new PipeBlockRenderer(this.pipeModel);
     }
+
+    @Override
+    public PipeNetworkType getPipeType() {
+        return GTPipeNetworks.OPTICAL;
+    }
+
 
     @Override
     public LevelOpticalPipeNet getWorldPipeNet(ServerLevel level) {
@@ -100,12 +108,6 @@ public class OpticalPipeBlock extends PipeBlock<OpticalPipeType, OpticalPipeProp
             }
             return -1;
         };
-    }
-
-    @Override
-    public boolean canPipesConnect(PipeBlockEntity<OpticalPipeType, OpticalPipeProperties> selfTile, Direction side,
-                                   PipeBlockEntity<OpticalPipeType, OpticalPipeProperties> sideTile) {
-        return selfTile instanceof OpticalPipeBlockEntity && sideTile instanceof OpticalPipeBlockEntity;
     }
 
     @Override
