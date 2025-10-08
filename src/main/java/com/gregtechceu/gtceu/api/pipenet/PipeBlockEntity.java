@@ -43,7 +43,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -251,7 +250,7 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
 
     public NodeDataType getNodeData() {
         if (cachedNodeData == null) {
-            this.cachedNodeData = getPipeBlock().createProperties(this);
+            this.cachedNodeData = getPipeBlock().createProperties();
         }
         return cachedNodeData;
     }
@@ -276,7 +275,7 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
         if (!attachedToNet) {
             int activeConnections = getConnections();
             boolean isActiveNode = activeConnections != 0;
-            getPipeBlock().getWorldPipeNet((ServerLevel)level).addNode(getBlockPos(), getPipeBlock().createRawData(getBlockState(), null), activeConnections, isActiveNode);
+            getPipeBlock().getWorldPipeNet((ServerLevel)level).addNode(getBlockPos(), getPipeBlock().createRawData(), activeConnections, isActiveNode);
         }
 
         if (!waitingToAdd.isEmpty()) {

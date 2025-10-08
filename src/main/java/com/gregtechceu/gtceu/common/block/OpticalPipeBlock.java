@@ -7,7 +7,6 @@ import com.gregtechceu.gtceu.api.pipenet.PipeBlockEntity;
 import com.gregtechceu.gtceu.api.pipenet.PipeNetworkType;
 import com.gregtechceu.gtceu.client.model.PipeModel;
 import com.gregtechceu.gtceu.client.renderer.block.PipeBlockRenderer;
-import com.gregtechceu.gtceu.common.blockentity.OpticalPipeBlockEntity;
 import com.gregtechceu.gtceu.common.data.GTBlockEntities;
 import com.gregtechceu.gtceu.common.pipelike.GTPipeNetworks;
 import com.gregtechceu.gtceu.common.pipelike.optical.LevelOpticalPipeNet;
@@ -18,7 +17,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -69,20 +67,8 @@ public class OpticalPipeBlock extends PipeBlock<OpticalPipeType, OpticalPipeProp
     }
 
     @Override
-    public OpticalPipeProperties createRawData(BlockState pState, @Nullable ItemStack pStack) {
-        return null;
-    }
-
-    @Override
-    public OpticalPipeProperties createProperties(@NotNull PipeBlockEntity<OpticalPipeType, OpticalPipeProperties> pipeTile) {
-        OpticalPipeType pipeType = pipeTile.getPipeType();
-        if (pipeType == null) return getFallbackType();
-        return this.pipeType.modifyProperties(properties);
-    }
-
-    @Override
-    public OpticalPipeProperties getFallbackType() {
-        return OpticalPipeProperties.INSTANCE;
+    public OpticalPipeProperties createRawData() {
+        return properties;
     }
 
     @Override
