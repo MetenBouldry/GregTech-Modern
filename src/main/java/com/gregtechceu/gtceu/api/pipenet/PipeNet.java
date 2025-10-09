@@ -13,7 +13,7 @@ import lombok.Getter;
 
 import java.util.*;
 
-public abstract class PipeNet {
+public class PipeNet {
 
     protected final LevelPipeNet worldData;
     private final Map<BlockPos, Node> nodeByBlockPos = new HashMap<>();

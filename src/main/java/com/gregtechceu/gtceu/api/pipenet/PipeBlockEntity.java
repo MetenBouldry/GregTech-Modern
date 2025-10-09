@@ -74,6 +74,9 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
     private final FieldManagedStorage syncStorage = new FieldManagedStorage(this);
     private final long offset = GTValues.RNG.nextInt(20);
 
+    public static final int ALL_OPENED = 0b111111;
+    public static final int ALL_CLOSED = 0b000000;
+
     @Getter
     @DescSynced
     @Persisted(key = "cover")
@@ -84,12 +87,12 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
     @DescSynced
     @Persisted
     @RequireRerender
-    protected int connections = Node.ALL_CLOSED;
+    protected int connections = ALL_CLOSED;
     @Setter
     @DescSynced
     @Persisted
     @RequireRerender
-    private int blockedConnections = Node.ALL_CLOSED;
+    private int blockedConnections = ALL_CLOSED;
     private NodeDataType cachedNodeData;
 
     @Persisted

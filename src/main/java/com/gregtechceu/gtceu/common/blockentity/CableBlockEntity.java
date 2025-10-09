@@ -51,7 +51,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CableBlockEntity extends PipeBlockEntity<Insulation, WireProperties> implements IDataInfoProvider {
+public class CableBlockEntity extends PipeBlockEntity<WireType, WireProperties> implements IDataInfoProvider {
 
     public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(CableBlockEntity.class,
             PipeBlockEntity.MANAGED_FIELD_HOLDER);
@@ -283,7 +283,7 @@ public class CableBlockEntity extends PipeBlockEntity<Insulation, WireProperties
         setTemperature(getDefaultTemp());
         int index = getPipeType().insulationLevel;
         CableBlock newBlock = GTMaterialBlocks.CABLE_BLOCKS
-                .get(Insulation.values()[index].tagPrefix, getPipeBlock().material)
+                .get(WireType.values()[index].tagPrefix, getPipeBlock().material)
                 .get();
         level.setBlockAndUpdate(getBlockPos(), newBlock.defaultBlockState());
         CableBlockEntity newCable = (CableBlockEntity) level.getBlockEntity(getBlockPos());
