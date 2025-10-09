@@ -1,21 +1,21 @@
 package com.gregtechceu.gtceu.common.pipelike.item;
 
-import com.gregtechceu.gtceu.api.data.chemical.material.properties.ItemPipeProperties;
 import com.gregtechceu.gtceu.api.pipenet.LevelPipeNet;
 import com.gregtechceu.gtceu.api.pipenet.Node;
 import com.gregtechceu.gtceu.api.pipenet.PipeNet;
 
+import com.gregtechceu.gtceu.common.pipelike.GTPipeNetworks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 
 import java.util.*;
 
-public class ItemPipeNet extends PipeNet<ItemPipeProperties> {
+public class ItemPipeNet extends PipeNet {
 
     private final Map<BlockPos, List<ItemRoutePath>> NET_DATA = new HashMap<>();
 
-    public ItemPipeNet(LevelPipeNet<ItemPipeProperties, ? extends PipeNet<ItemPipeProperties>> world) {
-        super(world);
+    public ItemPipeNet(LevelPipeNet world) {
+        super(world, GTPipeNetworks.ITEM);
     }
 
     public List<ItemRoutePath> getNetData(BlockPos pipePos, Direction facing) {
@@ -33,18 +33,8 @@ public class ItemPipeNet extends PipeNet<ItemPipeProperties> {
     }
 
     @Override
-    public void onNeighbourUpdate(BlockPos fromPos) {
-        NET_DATA.clear();
-    }
-
-    @Override
-    public void onPipeConnectionsUpdate() {
-        NET_DATA.clear();
-    }
-
-    @Override
-    protected void transferNodeData(Map<BlockPos, Node<ItemPipeProperties>> transferredNodes,
-                                    PipeNet<ItemPipeProperties> parentNet) {
+    protected void transferNodeData(Map<BlockPos, Node> transferredNodes,
+                                    PipeNet parentNet) {
         super.transferNodeData(transferredNodes, parentNet);
         NET_DATA.clear();
         ((ItemPipeNet) parentNet).NET_DATA.clear();
