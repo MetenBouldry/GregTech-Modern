@@ -10,6 +10,7 @@ import com.gregtechceu.gtceu.api.data.chemical.material.properties.WirePropertie
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.pipenet.PipeBlockEntity;
 import com.gregtechceu.gtceu.api.pipenet.PipeNetworkType;
+import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.client.model.PipeModel;
 import com.gregtechceu.gtceu.common.blockentity.CableBlockEntity;
 import com.gregtechceu.gtceu.common.data.GTBlockEntities;
@@ -129,5 +130,10 @@ public class CableBlock extends MaterialPipeBlock<WireType, WireProperties> {
                 }
             }
         }
+    }
+
+    @Override
+    public GTToolType getPipeTuneTool() {
+        return GTToolType.WIRE_CUTTER;
     }
 }
